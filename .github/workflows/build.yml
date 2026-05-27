@@ -1,0 +1,34 @@
+name: Build DogTracker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build DogTracker IPA
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build
+      run: |
+        xcodebuild -project DogTracker.xcodeproj \
+          -scheme DogTracker \
+          -sdk iphoneos \
+          -configuration Release \
+          -derivedDataPath build \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Package IPA
+      run: |
+        mkdir -p Payload
+        cp -r build/Build/Products/Release-iphoneos/DogTracker.app Payload/
+        zip -r DogTracker.ipa Payload/
+        rm -rf Payload
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: DogTracker-IPA
+        path: DogTracker.ipa
