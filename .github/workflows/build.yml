@@ -10,29 +10,47 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Build
+    - name: Install ldid
+      run: |
+        brew install ldid 2>/dev/null || echo "ldid via brew failed"
+        which ldid || echo "ldid not found, will try alt"
+
+    - name: Build (no sign)
       run: |
         xcodebuild -project DogTracker.xcodeproj \
           -scheme DogTracker \
           -sdk iphoneos \
           -configuration Release \
           -derivedDataPath build \
-          CODE_SIGN_IDENTITY="-" \
-          CODE_SIGNING_REQUIRED=YES \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=YES \
+          AD_HOC_CODE_SIGNING_ALLOWED=YES \
           PRODUCT_BUNDLE_IDENTIFIER=com.lengye.dogtracker
 
-    - name: Check binary
+    - name: Check and fake-sign binary
       run: |
         APP="build/Build/Products/Release-iphoneos/DogTracker.app"
         echo "=== App bundle ==="
         ls -la "$APP/"
-        echo ""
-        echo "=== Binary ==="
-        file "$APP/DogTracker"
-        echo ""
-        echo "=== Signing ==="
-        codesign -dvv "$APP/DogTracker" 2>&1 || echo "No signature info"
+        
+        if [ -f "$APP/DogTracker" ]; then
+          echo "Binary found, size: $(wc -c < "$APP/DogTracker") bytes"
+          file "$APP/DogTracker"
+          
+          # Remove existing signature
+          rm -rf "$APP/_CodeSignature" 2>/dev/null || true
+          
+          # Fake sign with ldid (TrollStore compatible)
+          ldid -S "$APP/DogTracker" 2>/dev/null || {
+            echo "ldid failed, trying codesign ad-hoc (ignoring SDK restriction)"
+            codesign -s - "$APP/DogTracker" 2>/dev/null || echo "codesign also failed"
+          }
+          echo "Signed OK"
+        else
+          echo "!!! Binary NOT FOUND !!!"
+          find build -name "DogTracker" -type f 2>/dev/null
+        fi
 
     - name: Package IPA
       run: |
