@@ -1,0 +1,272 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		001 /* DogTrackerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101; };
+		002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102; };
+		003 /* DogTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103; };
+		004 /* DogTrackerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 104; };
+		005 /* BLEScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105; };
+		006 /* FindMyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106; };
+		007 /* MapTrackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107; };
+		008 /* RadarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108; };
+		009 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 109; };
+		010 /* TagManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110; };
+		011 /* ShibaAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		101 /* DogTrackerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogTrackerApp.swift; sourceTree = "<group>"; };
+		102 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		103 /* DogTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogTag.swift; sourceTree = "<group>"; };
+		104 /* DogTrackerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogTrackerViewModel.swift; sourceTree = "<group>"; };
+		105 /* BLEScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScanner.swift; sourceTree = "<group>"; };
+		106 /* FindMyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindMyService.swift; sourceTree = "<group>"; };
+		107 /* MapTrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapTrackView.swift; sourceTree = "<group>"; };
+		108 /* RadarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadarView.swift; sourceTree = "<group>"; };
+		109 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		110 /* TagManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagManagerView.swift; sourceTree = "<group>"; };
+		111 /* ShibaAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShibaAvatar.swift; sourceTree = "<group>"; };
+		201 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		301 /* DogTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DogTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		401 = {
+			isa = PBXGroup;
+			children = (
+				402 /* DogTracker group */,
+				403 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		402 /* DogTracker */ = {
+			isa = PBXGroup;
+			children = (
+				101, 102, 201,
+				501 /* Models */,
+				502 /* Services */,
+				503 /* Views */,
+			);
+			path = DogTracker;
+			sourceTree = "<group>";
+		};
+		403 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				301,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		501 /* Models */ = {
+			isa = PBXGroup;
+			children = (103, 104);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		502 /* Services */ = {
+			isa = PBXGroup;
+			children = (105, 106);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		503 /* Views */ = {
+			isa = PBXGroup;
+			children = (107, 108, 109, 110, 111);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		601 /* DogTracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 701;
+			buildPhases = (
+				801 /* Sources */,
+				802 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DogTracker;
+			productName = DogTracker;
+			productReference = 301;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		901 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+			};
+			buildConfigurationList = 702;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+			);
+			mainGroup = 401;
+			productRefGroup = 403;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				601,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		802 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		801 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				001, 002, 003, 004, 005, 006, 007, 008, 009, 010, 011,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9021 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = DogTracker/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lengye.dogtracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		9022 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = DogTracker/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lengye.dogtracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		701 /* Build config for DogTracker target */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9021,
+				9022,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		702 /* Build config for project */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9011,
+				9012,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 901 /* Project object */;
+}
