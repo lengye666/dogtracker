@@ -221,6 +221,34 @@ struct TimelineRowView: View {
     }
 }
 
+// MARK: - 统计卡片
+
+struct StatCard: View {
+    let icon: String
+    let value: String
+    let unit: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundColor(color)
+            HStack(alignment: .bottom, spacing: 2) {
+                Text(value)
+                    .font(.system(size: 24, weight: .bold))
+                Text(unit)
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(Color.white.opacity(0.06))
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
 // MARK: - 全屏轨迹图
 
 struct FullTrackMapSheet: View {

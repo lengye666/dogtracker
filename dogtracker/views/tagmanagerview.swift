@@ -218,109 +218,22 @@ struct AddTagSheet: View {
     
     let breeds = ["柴犬", "柯基", "金毛", "哈士奇", "泰迪", "比熊", "拉布拉多", "边牧", "其他"]
     
+    var canPair: Bool {
+        !dogName.isEmpty && (!tagMAC.isEmpty || isScanning)
+    }
+    
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // 狗子信息
-                    VStack(alignment: .leading, spacing: 12) {
-                        SectionLabel("狗子信息")
-                        
-                        HStack {
-                            Text("🐕")
-                                .font(.system(size: 36))
-                            VStack(spacing: 0) {
-                                TextField("给狗子取个名", text: $dogName)
-                                    .font(.system(size: 20, weight: .bold))
-                                    .textContentType(.name)
-                                Divider()
-                                    .padding(.top, 6)
-                            }
-                        }
-                        .padding()
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                        
-                        // 品种选择
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 8) {
-                                ForEach(breeds, id: \.self) { breed in
-                                    Button(action: { dogBreed = breed }) {
-                                        Text(breed)
-                                            .font(.system(size: 13, weight: .medium))
-                                            .foregroundColor(dogBreed == breed ? .white : .secondary)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 8)
-                                            .background(
-                                                dogBreed == breed ?
-                                                Capsule().fill(.accentColor) :
-                                                Capsule().fill(.white.opacity(0.08))
-                                            )
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 4)
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    
-                    // Tag 信息
-                    VStack(alignment: .leading, spacing: 12) {
-                        SectionLabel("Tag 设备")
-                        
-                        // 自动扫描
-                        Button(action: startAutoScan) {
-                            HStack {
-                                Image(systemName: isScanning ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
-                                    .font(.system(size: 18))
-                                    .foregroundColor(isScanning ? .blue : .secondary)
-                                Text(isScanning ? "正在扫描附近的 Tag..." : "自动扫描 Tag")
-                                    .font(.system(size: 14, weight: .medium))
-                                Spacer()
-                                if isScanning {
-                                    ProgressView()
-                                }
-                            }
-                            .padding()
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                        }
-                        
-                        // 或手动输入
-                        VStack(spacing: 8) {
-                            Text("或手动输入 MAC 地址")
-                                .font(.system(size: 12))
-                                .foregroundColor(.secondary)
-                            
-                            TextField("AA:BB:CC:DD:EE:FF", text: $tagMAC)
-                                .font(.system(size: 15, design: .monospaced))
-                                .textContentType(.none)
-                                .autocapitalization(.allCharacters)
-                                .multilineTextAlignment(.center)
-                                .padding()
-                                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    
-                    Spacer(minLength: 20)
-                    
-                    // 绑定按钮
-                    Button(action: pairTag) {
-                        HStack {
-                            Image(systemName: "link")
-                            Text("绑定 Tag")
-                                .font(.system(size: 17, weight: .semibold))
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                        .background(canPair ? Color.green : Color.gray)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                    }
-                    .disabled(!canPair)
-                    .padding(.horizontal, 16)
-                }
-                .padding(.top, 16)
-            }
+            AddTagContent(
+                dogName: $dogName,
+                dogBreed: $dogBreed,
+                tagMAC: $tagMAC,
+                isScanning: $isScanning,
+                breeds: breeds,
+                canPair: canPair,
+                onPair: pairTag,
+                onScan: startAutoScan
+            )
             .navigationTitle("绑定新 Tag")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -332,17 +245,12 @@ struct AddTagSheet: View {
         .alert("✅ 配对成功", isPresented: $showPairedAlert) {
             Button("好的") { isPresented = false }
         } message: {
-            Text("\(dogName) 已成功绑定！现在可以在 App 中追踪它了。")
+            Text("\(dogName) 已成功绑定！")
         }
-    }
-    
-    var canPair: Bool {
-        !dogName.isEmpty && (!tagMAC.isEmpty || isScanning)
     }
     
     func startAutoScan() {
         isScanning = true
-        // 模拟扫描 2 秒后发现设备
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             tagMAC = "AA:BB:CC:DD:EE:FF"
             isScanning = false
@@ -350,8 +258,6 @@ struct AddTagSheet: View {
     }
     
     func pairTag() {
-        guard canPair else { return }
-        
         let newDog = DogTag(
             id: UUID().uuidString,
             name: dogName,
@@ -363,12 +269,128 @@ struct AddTagSheet: View {
             batteryLevel: 100,
             isConnected: true
         )
-        
         vm.dogs.append(newDog)
-        if vm.selectedDog == nil {
-            vm.selectedDog = newDog
-        }
+        if vm.selectedDog == nil { vm.selectedDog = newDog }
         showPairedAlert = true
+    }
+}
+
+struct AddTagContent: View {
+    @Binding var dogName: String
+    @Binding var dogBreed: String
+    @Binding var tagMAC: String
+    @Binding var isScanning: Bool
+    let breeds: [String]
+    let canPair: Bool
+    let onPair: () -> Void
+    let onScan: () -> Void
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                DogInfoSection(dogName: $dogName, dogBreed: $dogBreed, breeds: breeds)
+                TagDeviceSection(tagMAC: $tagMAC, isScanning: $isScanning, onScan: onScan)
+                Spacer(minLength: 20)
+                PairButton(canPair: canPair, onPair: onPair)
+            }
+            .padding(.top, 16)
+        }
+    }
+}
+
+struct DogInfoSection: View {
+    @Binding var dogName: String
+    @Binding var dogBreed: String
+    let breeds: [String]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionLabel("狗子信息")
+            HStack {
+                Text("🐕").font(.system(size: 36))
+                VStack(spacing: 0) {
+                    TextField("给狗子取个名", text: $dogName)
+                        .font(.system(size: 20, weight: .bold))
+                    Divider().padding(.top, 6)
+                }
+            }
+            .padding()
+            .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14))
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(breeds, id: \.self) { breed in
+                        Button(action: { dogBreed = breed }) {
+                            Text(breed)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(dogBreed == breed ? .white : .secondary)
+                                .padding(.horizontal, 14).padding(.vertical, 8)
+                                .background(
+                                    Capsule().fill(dogBreed == breed ? Color.accentColor : Color.white.opacity(0.08))
+                                )
+                        }
+                    }
+                }
+                .padding(.horizontal, 4)
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+}
+
+struct TagDeviceSection: View {
+    @Binding var tagMAC: String
+    @Binding var isScanning: Bool
+    let onScan: () -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionLabel("Tag 设备")
+            Button(action: onScan) {
+                HStack {
+                    Image(systemName: isScanning ? "antenna.radiowaves.left.and.right" : "antenna.radiowaves.left.and.right.slash")
+                        .font(.system(size: 18))
+                        .foregroundColor(isScanning ? .blue : .secondary)
+                    Text(isScanning ? "正在扫描..." : "自动扫描 Tag")
+                        .font(.system(size: 14, weight: .medium))
+                    Spacer()
+                    if isScanning { ProgressView() }
+                }
+                .padding()
+                .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14))
+            }
+            VStack(spacing: 8) {
+                Text("或手动输入 MAC 地址").font(.system(size: 12)).foregroundColor(.secondary)
+                TextField("AA:BB:CC:DD:EE:FF", text: $tagMAC)
+                    .font(.system(size: 15, design: .monospaced))
+                    .autocapitalization(.allCharacters)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14))
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+}
+
+struct PairButton: View {
+    let canPair: Bool
+    let onPair: () -> Void
+    
+    var body: some View {
+        Button(action: onPair) {
+            HStack {
+                Image(systemName: "link")
+                Text("绑定 Tag").font(.system(size: 17, weight: .semibold))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(canPair ? Color.green : Color.gray)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .disabled(!canPair)
+        .padding(.horizontal, 16)
     }
 }
 
