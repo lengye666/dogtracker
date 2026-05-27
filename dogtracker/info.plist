@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>狗子定位</string>
+    <key>CFBundleDisplayName</key>
+    <string>狗子定位</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.lengye.dogtracker</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UILaunchScreen</key>
+    <dict/>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>bluetooth-le</string>
+        <string>location-services</string>
+    </array>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>需要定位权限来追踪你家狗子的位置和距离</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>即使在后台也需要知道狗子去哪了</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>用蓝牙来探测狗子离你多远</string>
+    <key>UIStatusBarStyle</key>
+    <string>UIStatusBarStyleLightContent</string>
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <false/>
+</dict>
+</plist>

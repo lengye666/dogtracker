@@ -1,0 +1,17 @@
+DogTracker/
+├── DogTracker.xcodeproj/
+├── DogTracker/
+│   ├── DogTrackerApp.swift       # App 入口
+│   ├── ContentView.swift         # 主 Tab 页面
+│   ├── Models/
+│   │   ├── DogTag.swift          # 数据模型
+│   │   └── LocationManager.swift  # 定位 + Find My
+│   ├── Views/
+│   │   ├── MapView.swift         # 地图追踪页
+│   │   ├── RadarView.swift       # BLE 近距雷达
+│   │   ├── HistoryView.swift     # 历史轨迹
+│   │   └── SettingsView.swift    # 设置
+│   └── Services/
+│       ├── BLEScanner.swift      # BLE 扫描 测距
+│       └── FindMyService.swift   # Find My 位置解析
+└── README.md
