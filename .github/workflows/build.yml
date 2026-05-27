@@ -19,14 +19,45 @@ jobs:
           -derivedDataPath build \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_ALLOWED=NO \
+          PRODUCT_BUNDLE_IDENTIFIER=com.lengye.dogtracker
+
+    - name: Verify binary
+      run: |
+        APP_PATH="build/Build/Products/Release-iphoneos/DogTracker.app"
+        echo "Checking app bundle..."
+        ls -la "$APP_PATH/"
+        echo ""
+        echo "Binary:"
+        ls -la "$APP_PATH/DogTracker" 2>/dev/null || echo "Binary NOT FOUND - searching..."
+        find "$APP_PATH" -type f -perm +111 2>/dev/null || echo "No executable found"
+        file "$APP_PATH/DogTracker" 2>/dev/null || true
+
+    - name: Fake sign with ldid
+      run: |
+        APP_PATH="build/Build/Products/Release-iphoneos/DogTracker.app"
+        # TrollStore needs a "signed" binary - use ldid to add a fake signature
+        ldid -S "$APP_PATH/DogTracker" 2>/dev/null || echo "ldid not available, trying alternative"
+        # If ldid fails, try copying binary as fallback
+        if [ ! -f "$APP_PATH/DogTracker" ]; then
+          # Binary might be in a different location
+          find build -name "DogTracker" -type f 2>/dev/null
+        fi
 
     - name: Package IPA
       run: |
+        APP_PATH="build/Build/Products/Release-iphoneos/DogTracker.app"
         mkdir -p Payload
-        cp -r build/Build/Products/Release-iphoneos/DogTracker.app Payload/
+        cp -r "$APP_PATH" Payload/
+        
+        # Verify binary inside Payload
+        echo "Binary in Payload:"
+        file Payload/DogTracker.app/DogTracker 2>/dev/null || echo "MISSING!"
+        ls -la Payload/DogTracker.app/
+        
         zip -r DogTracker.ipa Payload/
         rm -rf Payload
+        echo "IPA size: $(ls -lh DogTracker.ipa | awk '{print $5}')"
 
     - uses: actions/upload-artifact@v4
       with:
