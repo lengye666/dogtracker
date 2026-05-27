@@ -1,50 +1,137 @@
 import SwiftUI
 import MapKit
 
+// MARK: - MKMapView 包装器 (兼容 iOS 15+)
+
+struct MapView: UIViewRepresentable {
+    @Binding var region: MKCoordinateRegion
+    var dogLocation: CLLocationCoordinate2D?
+    var trackPoints: [CLLocationCoordinate2D]
+    var dogName: String
+    
+    func makeUIView(context: Context) -> MKMapView {
+        let map = MKMapView()
+        map.delegate = context.coordinator
+        map.showsUserLocation = true
+        map.userTrackingMode = .follow
+        map.showsCompass = true
+        map.showsScale = true
+        return map
+    }
+    
+    func updateUIView(_ map: MKMapView, context: Context) {
+        map.setRegion(region, animated: true)
+        map.removeOverlays(map.overlays)
+        map.removeAnnotations(map.annotations.filter { !($0 is MKUserLocation) })
+        
+        // 狗位置标注
+        if let dogLoc = dogLocation {
+            let pin = MKPointAnnotation()
+            pin.coordinate = dogLoc
+            pin.title = dogName
+            map.addAnnotation(pin)
+        }
+        
+        // 轨迹线
+        if trackPoints.count > 1 {
+            let polyline = MKPolyline(coordinates: trackPoints, count: trackPoints.count)
+            map.addOverlay(polyline)
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+    
+    class Coordinator: NSObject, MKMapViewDelegate {
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if let polyline = overlay as? MKPolyline {
+                let renderer = MKPolylineRenderer(polyline: polyline)
+                renderer.strokeColor = UIColor.blue.withAlphaComponent(0.5)
+                renderer.lineWidth = 3
+                return renderer
+            }
+            return MKOverlayRenderer(overlay: overlay)
+        }
+        
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            guard !(annotation is MKUserLocation) else { return nil }
+            
+            let id = "DogPin"
+            var view = mapView.dequeueReusableAnnotationView(withIdentifier: id)
+            if view == nil {
+                view = MKAnnotationView(annotation: annotation, reuseIdentifier: id)
+                view?.canShowCallout = true
+            }
+            view?.annotation = annotation
+            
+            // 柴犬头像作为标注
+            let size: CGFloat = 40
+            let container = UIView(frame: CGRect(x: 0, y: 0, width: size + 10, height: size + 10))
+            let imageView = UIImageView(frame: CGRect(x: 5, y: 5, width: size, height: size))
+            imageView.contentMode = .scaleAspectFit
+            
+            // 用代码绘制柴犬脸
+            let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size))
+            let img = renderer.image { ctx in
+                let rect = CGRect(x: 0, y: 0, width: size, height: size)
+                // 橙色圆形
+                UIColor.orange.setFill()
+                ctx.fill(CGRect(x: 1, y: 1, width: size-2, height: size-2))
+                // 白色面部
+                UIColor.white.setFill()
+                let faceRect = CGRect(x: size*0.18, y: size*0.18, width: size*0.64, height: size*0.55)
+                let facePath = UIBezierPath(roundedRect: faceRect, cornerRadius: size*0.3)
+                facePath.fill()
+                // 眼睛
+                UIColor.black.setFill()
+                UIBezierPath(ovalIn: CGRect(x: size*0.3, y: size*0.28, width: size*0.08, height: size*0.10)).fill()
+                UIBezierPath(ovalIn: CGRect(x: size*0.62, y: size*0.28, width: size*0.08, height: size*0.10)).fill()
+                // 鼻子
+                let noseRect = CGRect(x: size*0.38, y: size*0.5, width: size*0.24, height: size*0.1)
+                UIBezierPath(roundedRect: noseRect, cornerRadius: size*0.05).fill()
+            }
+            imageView.image = img
+            container.addSubview(imageView)
+            view?.addSubview(container)
+            
+            return view
+        }
+    }
+}
+
+// MARK: - 地图追踪页
+
 struct MapTrackView: View {
     @EnvironmentObject var vm: DogTrackerViewModel
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 39.9042, longitude: 116.4074),
         span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
     )
-    @State private var position: MapCameraPosition = .automatic
     
     var body: some View {
         ZStack(alignment: .top) {
-            // 地图
-            Map(position: $position) {
-                // 用户位置
-                UserAnnotation()
-                
-                // 狗的位置
-                if let dog = vm.selectedDog, let loc = dog.lastLocation {
-                    Annotation(dog.name, coordinate: loc) {
-                        DogAnnotationView(name: dog.name)
-                    }
-                }
-                
-                // 轨迹线
-                MapPolyline(coordinates: vm.trackHistory.map { $0.coordinate })
-                    .stroke(.blue.opacity(0.4), lineWidth: 3)
-            }
-            .mapStyle(.standard(elevation: .flat, emphasis: .muted))
-            .mapControls {
-                MapUserLocationButton()
-                MapCompass()
-                MapScaleView()
-            }
+            MapView(
+                region: $region,
+                dogLocation: vm.selectedDog?.lastLocation,
+                trackPoints: vm.trackHistory.map { $0.coordinate },
+                dogName: vm.selectedDog?.name ?? "狗子"
+            )
             .ignoresSafeArea(edges: .top)
             
-            // 顶部信息覆盖层
             VStack(spacing: 10) {
-                // 安全区占位
                 Color.clear.frame(height: 50)
                 
                 // 距离标签
-                if let dog = vm.selectedDog, let loc = dog.lastLocation {
+                if let dog = vm.selectedDog, let _ = dog.lastLocation {
                     HStack {
                         Spacer()
-                        DistanceLabel(dog: dog, dogLocation: loc)
+                        Text("距狗 \(Int.random(in: 50...500))m")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 7)
+                            .background(Capsule().fill(.black.opacity(0.7)))
                         Spacer()
                     }
                 }
@@ -58,69 +145,7 @@ struct MapTrackView: View {
         .onAppear {
             if let dog = vm.selectedDog, let loc = dog.lastLocation {
                 region.center = loc
-                position = .region(region)
             }
-        }
-    }
-}
-
-// MARK: - 狗子地图标注
-
-struct DogAnnotationView: View {
-    let name: String
-    @State private var isAnimating = false
-    
-    var body: some View {
-        VStack(spacing: 2) {
-            ZStack {
-                Circle()
-                    .fill(.orange.opacity(0.25))
-                    .frame(width: 48, height: 48)
-                    .scaleEffect(isAnimating ? 1.5 : 1.0)
-                    .opacity(isAnimating ? 0 : 0.5)
-                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: false), value: isAnimating)
-                
-                ShibaAvatar(named: name, size: 36, connected: true)
-            }
-            
-            Text(name)
-                .font(.system(size: 11, weight: .bold))
-                .padding(.horizontal, 8)
-                .padding(.vertical, 2)
-                .background(.ultraThinMaterial, in: Capsule())
-        }
-        .onAppear { isAnimating = true }
-    }
-}
-
-// MARK: - 距离标签
-
-struct DistanceLabel: View {
-    let dog: DogTag
-    let dogLocation: CLLocationCoordinate2D
-    @State private var distance: Double = 0
-    
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "location.fill")
-                .font(.system(size: 11))
-            Text("距狗 \(Int(distance))m")
-                .font(.system(size: 13, weight: .semibold))
-            Circle()
-                .fill(.green)
-                .frame(width: 6, height: 6)
-        }
-        .foregroundColor(.white)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 7)
-        .background(
-            Capsule()
-                .fill(.black.opacity(0.7))
-        )
-        .onAppear {
-            // 演示：模拟距离
-            distance = Double.random(in: 50...500)
-            // 真实场景使用: distance = userLocation.distance(from: dogLocation)
         }
     }
 }

@@ -252,8 +252,8 @@ struct AddTagSheet: View {
                                             .padding(.vertical, 8)
                                             .background(
                                                 dogBreed == breed ?
-                                                AnyShapeStyle(Capsule().fill(.accentColor)) :
-                                                AnyShapeStyle(Capsule().fill(.ultraThinMaterial))
+                                                Capsule().fill(.accentColor) :
+                                                Capsule().fill(.white.opacity(0.08))
                                             )
                                     }
                                 }
@@ -313,11 +313,7 @@ struct AddTagSheet: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 52)
-                        .background(
-                            canPair ?
-                            AnyShapeStyle(LinearGradient(colors: [.green, .mint], startPoint: .leading, endPoint: .trailing)) :
-                            AnyShapeStyle(LinearGradient(colors: [.gray, .gray], startPoint: .leading, endPoint: .trailing))
-                        )
+                        .background(canPair ? Color.green : Color.gray)
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                     }
                     .disabled(!canPair)

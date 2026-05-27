@@ -121,8 +121,8 @@ struct RadarView: View {
                     .frame(width: 200, height: 52)
                     .background(
                         vm.isScanning ?
-                        AnyShapeStyle(.ultraThinMaterial) :
-                        AnyShapeStyle(LinearGradient(colors: [.blue, .accentColor], startPoint: .leading, endPoint: .trailing))
+                        Color.white.opacity(0.08) :
+                        Color.blue
                     )
                     .clipShape(Capsule())
                     .shadow(color: vm.isScanning ? .clear : .accentColor.opacity(0.4), radius: 12)
