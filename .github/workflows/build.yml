@@ -17,47 +17,31 @@ jobs:
           -sdk iphoneos \
           -configuration Release \
           -derivedDataPath build \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO \
+          CODE_SIGN_IDENTITY="-" \
+          CODE_SIGNING_REQUIRED=YES \
+          CODE_SIGNING_ALLOWED=YES \
           PRODUCT_BUNDLE_IDENTIFIER=com.lengye.dogtracker
 
-    - name: Verify binary
+    - name: Check binary
       run: |
-        APP_PATH="build/Build/Products/Release-iphoneos/DogTracker.app"
-        echo "Checking app bundle..."
-        ls -la "$APP_PATH/"
+        APP="build/Build/Products/Release-iphoneos/DogTracker.app"
+        echo "=== App bundle ==="
+        ls -la "$APP/"
         echo ""
-        echo "Binary:"
-        ls -la "$APP_PATH/DogTracker" 2>/dev/null || echo "Binary NOT FOUND - searching..."
-        find "$APP_PATH" -type f -perm +111 2>/dev/null || echo "No executable found"
-        file "$APP_PATH/DogTracker" 2>/dev/null || true
-
-    - name: Fake sign with ldid
-      run: |
-        APP_PATH="build/Build/Products/Release-iphoneos/DogTracker.app"
-        # TrollStore needs a "signed" binary - use ldid to add a fake signature
-        ldid -S "$APP_PATH/DogTracker" 2>/dev/null || echo "ldid not available, trying alternative"
-        # If ldid fails, try copying binary as fallback
-        if [ ! -f "$APP_PATH/DogTracker" ]; then
-          # Binary might be in a different location
-          find build -name "DogTracker" -type f 2>/dev/null
-        fi
+        echo "=== Binary ==="
+        file "$APP/DogTracker"
+        echo ""
+        echo "=== Signing ==="
+        codesign -dvv "$APP/DogTracker" 2>&1 || echo "No signature info"
 
     - name: Package IPA
       run: |
-        APP_PATH="build/Build/Products/Release-iphoneos/DogTracker.app"
+        APP="build/Build/Products/Release-iphoneos/DogTracker.app"
         mkdir -p Payload
-        cp -r "$APP_PATH" Payload/
-        
-        # Verify binary inside Payload
-        echo "Binary in Payload:"
-        file Payload/DogTracker.app/DogTracker 2>/dev/null || echo "MISSING!"
-        ls -la Payload/DogTracker.app/
-        
+        cp -r "$APP" Payload/
         zip -r DogTracker.ipa Payload/
         rm -rf Payload
-        echo "IPA size: $(ls -lh DogTracker.ipa | awk '{print $5}')"
+        ls -lh DogTracker.ipa
 
     - uses: actions/upload-artifact@v4
       with:
